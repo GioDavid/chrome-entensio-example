@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "vettx-extension",
+  "version": "1.0",
+  "description": "ok",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "http://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
