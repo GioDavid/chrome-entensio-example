@@ -31,18 +31,38 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function pasteText() {
-    const element = document.querySelector('textarea');
-
-    if (element) {
-      chrome.storage.local.get(["savedTexts"], function (result) {
+    chrome.storage.local.get(["savedTexts"], function (result) {
+      const element = document.querySelector('textarea');
+      const sendButton = document.querySelector('div[aria-label="Send"]');
+      if(element) {
         element.textContent= result.savedTexts[0];
-        const sendButton = document.querySelector('div[aria-label="Send"]');
         sendButton.click()
         console.log('Element found:', element);
-      });
-    } else {
-      console.log('Element not found.');
-    }
+      } else {
+
+      const modalButton = document.querySelector('div[aria-label="Message"]');
+      modalButton.click();
+
+      setTimeout(() => {
+        const textarea = document.querySelector('textarea[id^=":"]');
+
+        if(textarea) {
+          textarea.textContent = result.savedTexts[0];
+
+          const sendButton = document.querySelector('div[aria-label="Send Message"]');
+          sendButton.removeAttribute("disabled");
+          //TODO enable button
+
+          console.log('Element found:', sendButton);
+          
+
+        } else {
+          console.log('Element not found');
+        }
+  
+      }, 3000);
+      }
+    });
 
     chrome.runtime.sendMessage({ action: 'pasteText' });
 
