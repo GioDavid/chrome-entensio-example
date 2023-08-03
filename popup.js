@@ -36,31 +36,69 @@ document.addEventListener('DOMContentLoaded', function() {
       const sendButton = document.querySelector('div[aria-label="Send"]');
       if(element) {
         element.textContent= result.savedTexts[0];
-        sendButton.click()
         console.log('Element found:', element);
+        // sendButton.click()
       } else {
 
       const modalButton = document.querySelector('div[aria-label="Message"]');
-      modalButton.click();
+      if(modalButton) {
+        console.log('searching modal');
+        modalButton.click();
 
-      setTimeout(() => {
-        const textarea = document.querySelector('textarea[id^=":"]');
-
-        if(textarea) {
-          textarea.textContent = result.savedTexts[0];
-
-          const sendButton = document.querySelector('div[aria-label="Send Message"]');
-          sendButton.removeAttribute("disabled");
-          //TODO enable button
-
-          console.log('Element found:', sendButton);
-          
-
-        } else {
-          console.log('Element not found');
-        }
+        setTimeout(() => {
+          const textarea = document.querySelector('textarea[id^=":"]');
   
-      }, 3000);
+          if(textarea) {
+            textarea.textContent = result.savedTexts[0];
+  
+            const sendButton = document.querySelector('div[aria-label="Send Message"]');
+            sendButton.removeAttribute("disabled");
+            //TODO enable button
+  
+            console.log('Element found:', sendButton);
+            
+  
+          } else {
+            console.log('Element not found');
+          }
+    
+        }, 1000);
+      } else {
+        const sendAgain = document.querySelector('div[aria-label="Message Again"]');
+        sendAgain.click();
+
+        setTimeout(() => {
+          const messageArea = document.querySelector('div[aria-describedby^=":"]');
+
+          if(messageArea) {
+            const children = messageArea.children;
+  
+  // Loop through the children and do something with each one
+          for (const child of children) {
+            const newSpan = document.createElement("span");
+            newSpan.textContent = result.savedTexts[0];
+            newSpan.setAttribute("data-lexical-text", "true");
+            child.appendChild(newSpan);
+            console.log(child.innerHTML); // This should now include the new <span> element
+          }
+
+          window.requestAnimationFrame(() => {
+            // The page should now show the added <span> elements visually
+          });
+            // textarea.textContent = result.savedTexts[0];
+  
+            // const sendButton = document.querySelector('div[aria-label="Send Message"]');
+            // sendButton.removeAttribute("disabled");
+            // //TODO enable button
+  
+            // console.log('Element found:', sendButton);
+            
+  
+          } else {
+            console.log('Element not found');
+          }
+        }, 1000);
+      }
       }
     });
 
