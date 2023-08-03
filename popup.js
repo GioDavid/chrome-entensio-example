@@ -23,7 +23,28 @@ document.addEventListener('DOMContentLoaded', function() {
     if (textarea) {
       var text = textarea.value;
       const textClass = [...textarea.classList]?.find(className => className?.startsWith('communications-input-'));
-      const url = textClass.replace(/^communications-input/, '')
+      const url = textClass.replace(/^communications-input-/, '');
+
+      // const iframe = document.createElement('iframe');
+      // iframe.style.display = 'none';  
+      // iframe.onload = () => {
+      //   try {
+      //     const html = iframe.contentDocument.documentElement.outerHTML;
+          
+      //     resolve(html);
+      //   } catch (error) {
+      //     reject(error);
+      //   } finally {
+      //     document.body.removeChild(iframe);
+      //   }
+      // };
+  
+      // iframe.onerror = (error) => {
+      //   reject(error);
+      //   document.body.removeChild(iframe);
+      // };
+  
+      // iframe.src = 'https://www.facebook.com/marketplace/item/1995611887469185/';
       chrome.runtime.sendMessage({ action: 'saveText', text: `${text},${url}` });
     }
   }

@@ -3,11 +3,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     var text = request.text;
 
     chrome.storage.local.get(["savedTexts"], function (result) {
-      var savedTexts = result.savedTexts || [];
-      savedTexts.push(text);
+      var savedTexts = [];
+      const values = text.split(',');
 
-      console.log("Stored", text);
-      chrome.storage.local.set({ savedTexts: savedTexts }, function () {
+      const textValue = values[0];
+      const url = values[1];
+
+      savedTexts = [...textValue];
+
+      console.log("Stored", textValue);
+      console.log("Stored url", url);
+
+      chrome.storage.local.set({ savedTexts: savedTexts, url }, function () {
         sendResponse();
       });
     });
