@@ -1,3 +1,26 @@
+import browser from 'webextension-polyfill';
+
+function scrapePage(url, selector) {
+  fetch(url)
+    .then((response) => response.text())
+    .then((html) => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const element = doc.querySelector('[placeholder="Send a private message…"]');
+      if (element) {
+        console.log('Element found:', element);
+      } else {
+        console.log('Element not found.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error fetching the page:', error);
+    });
+}
+
+// Example usage - replace 'https://example.com' and 'your_selector' with your desired URL and selector
+scrapePage('https://www.facebook.com/marketplace/item/1995611887469185/', 'your_selector');
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // if (request.action === "dropText") {
   //   function getTextareaByValue(value) {
