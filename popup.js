@@ -64,10 +64,10 @@ if (!navigator.clipboard){
     chrome.storage.local.get(["savedTexts"], function (result) {
       const element = document.querySelector('textarea');
       if(element) {
-        // const sendButton = document.querySelector('div[aria-label="Send"]');
+        const sendButton = document.querySelector('div[aria-label="Send"]');
         element.textContent= result.savedTexts[0];
         console.log('Element from short flow found:', element);
-        // sendButton.click();
+        sendButton.click();
       } else {
 
       const modalButton = document.querySelector('div[aria-label="Message"]');
