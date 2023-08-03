@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       console.log("Stored", textValue);
       console.log("Stored url", url);
 
-      chrome.tabs.create({ url: 'https://www.facebook.com/marketplace/item/173096175785782/?ref=browse_tab&referral_code=marketplace_top_picks&referral_story_type=top_picks' }, (tab) => {
+      chrome.tabs.create({ url: 'https://www.facebook.com/marketplace/item/644244793915575/?ref=product_details&referral_code=marketplace_top_picks&referral_story_type=top_picks' }, (tab) => {
         // After the new tab is created, execute the content script in the tab
         console.log('tab created!')
       });

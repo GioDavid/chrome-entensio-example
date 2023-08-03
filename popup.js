@@ -5,6 +5,32 @@ document.addEventListener('DOMContentLoaded', function() {
   var dropButton = document.getElementById('dropButton');
   var textDisplay = document.getElementById('textDisplay');
 
+  function coypinClipboard (value) {
+if (!navigator.clipboard){
+   const dummy = document.createElement("input");
+
+   document.body.appendChild(dummy);
+ 
+   dummy.setAttribute("id", "dummy_id");
+ 
+   document.getElementById("dummy_id").value=value;
+ 
+   dummy.select();
+ 
+   document.execCommand("copy");
+    document.body.removeChild(dummy);
+} else{
+  navigator.clipboard.writeText(value).then(
+      function(){
+          alert("yeah!"); // success 
+      })
+    .catch(
+       function() {
+          alert("err"); // error
+    });
+} 
+  }
+
   function getTabID() {
     return new Promise((resolve, reject) => {
         try {
@@ -25,6 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
       var text = textarea.value;
       const textClass = [...textarea.classList]?.find(className => className?.startsWith('communications-input-'));
       const url = textClass.replace(/^communications-input-/, '');
+      textarea.select();
+
+      // Execute the copy command
+      document.execCommand('copy');
 
       chrome.runtime.sendMessage({ action: 'saveText', text: `${text},${url}` });
     }
@@ -33,11 +63,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function pasteText() {
     chrome.storage.local.get(["savedTexts"], function (result) {
       const element = document.querySelector('textarea');
-      const sendButton = document.querySelector('div[aria-label="Send"]');
       if(element) {
+        // const sendButton = document.querySelector('div[aria-label="Send"]');
         element.textContent= result.savedTexts[0];
-        console.log('Element found:', element);
-        // sendButton.click()
+        console.log('Element from short flow found:', element);
+        // sendButton.click();
       } else {
 
       const modalButton = document.querySelector('div[aria-label="Message"]');
@@ -71,6 +101,13 @@ document.addEventListener('DOMContentLoaded', function() {
           const messageArea = document.querySelector('div[aria-describedby^=":"]');
 
           if(messageArea) {
+
+            function handleSpanAdded(event) {
+              console.log("New span element added:", event.target);
+              // Do something with the newly added <span> element
+              // For example, you can access event.target to get the newly added <span> element
+            }
+
             const children = messageArea.children;
   
   // Loop through the children and do something with each one
@@ -79,19 +116,18 @@ document.addEventListener('DOMContentLoaded', function() {
             newSpan.textContent = result.savedTexts[0];
             newSpan.setAttribute("data-lexical-text", "true");
             child.appendChild(newSpan);
+            const event = new Event("spanAdded", { bubbles: true });
+            child.dispatchEvent(event);
             console.log(child.innerHTML); // This should now include the new <span> element
           }
 
           window.requestAnimationFrame(() => {
             // The page should now show the added <span> elements visually
           });
-            // textarea.textContent = result.savedTexts[0];
-  
-            // const sendButton = document.querySelector('div[aria-label="Send Message"]');
-            // sendButton.removeAttribute("disabled");
-            // //TODO enable button
-  
-            // console.log('Element found:', sendButton);
+          
+          for (const child of children) {
+            child.addEventListener("spanAdded", handleSpanAdded);
+          }
             
   
           } else {
