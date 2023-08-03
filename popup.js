@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (element) {
       chrome.storage.local.get(["savedTexts"], function (result) {
         element.textContent= result.savedTexts[0];
-        // const sendButton = document.querySelector('div[aria-label="Send"]');
-        // sendButton.click()
+        const sendButton = document.querySelector('div[aria-label="Send"]');
+        sendButton.click()
         console.log('Element found:', element);
       });
     } else {
@@ -78,10 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
 
   dropButton.addEventListener('click', function() {
-    // console.log("Drop Button Works")
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'dropText' });
-    });
+    chrome.storage.local.clear();
   });
 
   // chrome.storage.local.get(['savedTexts'], function(result) {
