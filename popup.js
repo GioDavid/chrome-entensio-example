@@ -34,16 +34,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const element = document.querySelector('textarea');
 
     if (element) {
-      element.textContent = 'Im interested on this vehicle.  Is it available?';
-
-      const sendButton = document.querySelector('div[aria-label="Send"]');
-      // sendButton.click()
-      console.log('Element found:', element);
+      chrome.storage.local.get(["savedTexts"], function (result) {
+        element.textContent= result.savedTexts[0];
+        // const sendButton = document.querySelector('div[aria-label="Send"]');
+        // sendButton.click()
+        console.log('Element found:', element);
+      });
     } else {
       console.log('Element not found.');
     }
 
-    chrome.runtime.sendMessage({ action: 'pasteText', element });
+    chrome.runtime.sendMessage({ action: 'pasteText' });
 
   }
 

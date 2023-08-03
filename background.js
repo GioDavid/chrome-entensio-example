@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       const textValue = values[0];
       const url = values[1];
 
-      savedTexts = [...textValue];
+      savedTexts = [textValue];
 
       console.log("Stored", textValue);
       console.log("Stored url", url);
