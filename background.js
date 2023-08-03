@@ -14,6 +14,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       console.log("Stored", textValue);
       console.log("Stored url", url);
 
+      chrome.tabs.create({ url: 'https://www.facebook.com/marketplace/item/1995611887469185/' }, (tab) => {
+        // After the new tab is created, execute the content script in the tab
+        console.log('tab created!')
+      });
+
       chrome.storage.local.set({ savedTexts: savedTexts, url }, function () {
         sendResponse();
       });
@@ -21,6 +26,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     return true;
   }
+
+  if (request.action === "pasteText") {
+    var text = request.text;
+
+    console.log("pasted text bg");
+
+    return true;
+  }
+
 
   if (request.action === "dropText") {
     var text = request.text;
