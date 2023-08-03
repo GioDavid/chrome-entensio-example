@@ -100,12 +100,4 @@ document.addEventListener('DOMContentLoaded', function() {
   dropButton.addEventListener('click', function() {
     chrome.storage.local.clear();
   });
-
-  // chrome.storage.local.get(['savedTexts'], function(result) {
-  //   var savedTexts = result.savedTexts || [];
-  //   if (savedTexts.length > 0) {
-  //     textDisplay.textContent = savedTexts[savedTexts.length - 1];
-  //     console.log('Retrieved text:', savedTexts[savedTexts.length - 1]);
-  //   }
-  // });
 });
