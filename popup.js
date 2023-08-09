@@ -1,3 +1,18 @@
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+    chrome.declarativeContent.onPageChanged.addRules([
+      {
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: { schemes: ["http", "https"] }, // Puedes ajustar los esquemas aquí
+          }),
+        ],
+        actions: [new chrome.declarativeContent.ShowPageAction()],
+      },
+    ]);
+  });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   console.log("Popup loaded")
   var grabButton = document.getElementById('grabButton');
@@ -57,18 +72,20 @@ if (!navigator.clipboard){
       document.execCommand('copy');
 
       chrome.runtime.sendMessage({ action: 'saveText', text: `${text},${url}` });
+      setTimeout(pasteText, 1000);
     }
   }
   
   function pasteText() {
+    console.log('opened here FB');
     chrome.storage.local.get(["savedTexts"], function (result) {
       const element = document.querySelector('textarea');
-      if(element) {
-        const sendButton = document.querySelector('div[aria-label="Send"]');
-        element.textContent= result.savedTexts[0];
-        console.log('Element from short flow found:', element);
-        sendButton.click();
-      } else {
+      // if(element) {
+      //   const sendButton = document.querySelector('div[aria-label="Send"]');
+      //   element.textContent= result.savedTexts[0];
+      //   console.log('Element from short flow found:', element);
+      //   sendButton.click();
+      // } else {
 
       const modalButton = document.querySelector('div[aria-label="Message"]');
       if(modalButton) {
@@ -78,20 +95,79 @@ if (!navigator.clipboard){
         setTimeout(() => {
           const textarea = document.querySelector('textarea[id^=":"]');
   
-          if(textarea) {
-            textarea.textContent = result.savedTexts[0];
+          // if(textarea) {
+          //   textarea.textContent = result.savedTexts[0];
   
-            const sendButton = document.querySelector('div[aria-label="Send Message"]');
-            sendButton.removeAttribute("disabled");
-            //TODO enable button
+          //   const sendButton = document.querySelector('div[aria-label="Send Message"]');
+          //   sendButton.removeAttribute("disabled");
   
-            console.log('Element found:', sendButton);
+          //   console.log('Element found:', sendButton);
             
   
-          } else {
-            console.log('Element not found');
+          // } else {
+          //   console.log('Element not found');
+          // }
+
+          function simulateTyping(element, textToType) {
+            return new Promise((resolve) => {
+              const delay = 100; // Adjust the typing speed if needed
+          
+              function typeCharacter(index) {
+                if (index < textToType.length) {
+                  const char = textToType[index];
+                  const inputEvent = new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true,
+                    data: char,
+                    inputType: 'insertText',
+                  });
+          
+                  element.value += char;
+                  element.dispatchEvent(inputEvent);
+          
+                  setTimeout(() => {
+                    typeCharacter(index + 1);
+                  }, delay);
+                } else {
+                  resolve();
+                }
+              }
+          
+              typeCharacter(0);
+            });
           }
-    
+
+          const spans = document.getElementsByTagName('span');
+          let firstSpan = null;
+
+          Array.from(spans).forEach(function(span) {
+              var spanText = span.textContent;
+      
+              if (spanText.includes("Me interesa este art")) {
+                  // Do something with the matched span element
+                 firstSpan = span;
+              }
+          });
+
+          if(firstSpan) {
+            firstSpan.parentElement.parentElement.click();  
+            const modalTextArea = document.querySelector('textarea[id^=":"]');
+  
+            if (modalTextArea) {
+              const textToType = "Está disponible?";
+            
+              simulateTyping(modalTextArea, textToType).then(() => {
+                // The typing has completed, observe the DOM changes to enable the button
+                const ariaLabel = 'Send Message';
+                const myButton = document.querySelector(`[aria-label="${ariaLabel}"]`);
+                myButton.click(); 
+              
+              }).catch(error => {
+                console.error(error);
+              });
+            }
+          }
         }, 1000);
       } else {
         const sendAgain = document.querySelector('div[aria-label="Message Again"]');
@@ -135,11 +211,8 @@ if (!navigator.clipboard){
           }
         }, 1000);
       }
-      }
+      // }
     });
-
-    chrome.runtime.sendMessage({ action: 'pasteText' });
-
   }
 
   grabButton.addEventListener('click', async function() {
@@ -175,3 +248,12 @@ if (!navigator.clipboard){
     chrome.storage.local.clear();
   });
 });
+
+
+// popup.js
+
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (request.action === "clickSendButton") {
+//     console.log("send button clicked");
+//     clickSendButton();
+

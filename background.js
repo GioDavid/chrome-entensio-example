@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
       chrome.tabs.create({ url }, (tab) => {
         // After the new tab is created, execute the content script in the tab
-        console.log('tab created!')
+        console.log('tab created!', tab);
       });
 
       chrome.storage.local.set({ savedTexts: savedTexts, url }, function () {
@@ -28,6 +28,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.action === "pasteText") {
+    var text = request.text;
+
+    console.log("pasted text bg");
+
+    return true;
+  }
+
+  if (request.action === "facebook-opened") {
     var text = request.text;
 
     console.log("pasted text bg");
