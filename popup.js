@@ -13,6 +13,14 @@ chrome.runtime.onInstalled.addListener(function() {
   });
 });
 
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+  if (message.action === 'sendMessage') {
+    // Aquí ejecutas la función que necesitas en el script de contenido
+    // Puedes llamar a grabberFunction() o cualquier función que necesites
+    pasteText();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   console.log("Popup loaded")
   var grabButton = document.getElementById('grabButton');

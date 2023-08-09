@@ -17,6 +17,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       chrome.tabs.create({ url }, (tab) => {
         // After the new tab is created, execute the content script in the tab
         console.log('tab created!', tab);
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          function: () => {
+            // Aquí puedes ejecutar la función que necesitas en el script de contenido
+            // por ejemplo, enviar un mensaje al script de contenido
+            chrome.runtime.sendMessage({ action: 'sendMessage' });
+          },
+        });
       });
 
       chrome.storage.local.set({ savedTexts: savedTexts, url }, function () {

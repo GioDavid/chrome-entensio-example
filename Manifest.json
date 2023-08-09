@@ -3,7 +3,9 @@
   "name": "vettx-extension",
   "version": "1.0",
   "description": "ok",
-  "permissions": ["activeTab", "storage", "scripting"],
+  "permissions": ["activeTab", "storage", "scripting",
+    "declarativeContent"
+],
   "action": {
     "default_popup": "popup.html"
   },
@@ -11,7 +13,8 @@
     "service_worker": "background.js"
   },
   "host_permissions": [
-    "http://*/*"
+    "http://*/*",
+    "https://*/*"  
   ],
   "content_scripts": [
     {
