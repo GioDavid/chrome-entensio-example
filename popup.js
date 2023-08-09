@@ -238,10 +238,3 @@ if (!navigator.clipboard){
 });
 
 
-// popup.js
-
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (request.action === "clickSendButton") {
-//     console.log("send button clicked");
-//     clickSendButton();
-
