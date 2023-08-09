@@ -94,19 +94,6 @@ if (!navigator.clipboard){
 
         setTimeout(() => {
           const textarea = document.querySelector('textarea[id^=":"]');
-  
-          // if(textarea) {
-          //   textarea.textContent = result.savedTexts[0];
-  
-          //   const sendButton = document.querySelector('div[aria-label="Send Message"]');
-          //   sendButton.removeAttribute("disabled");
-  
-          //   console.log('Element found:', sendButton);
-            
-  
-          // } else {
-          //   console.log('Element not found');
-          // }
 
           function simulateTyping(element, textToType) {
             return new Promise((resolve) => {
@@ -155,7 +142,8 @@ if (!navigator.clipboard){
             const modalTextArea = document.querySelector('textarea[id^=":"]');
   
             if (modalTextArea) {
-              const textToType = "Está disponible?";
+              
+              const textToType = result.savedTexts[0] || "Hola me interesa el carro";
             
               simulateTyping(modalTextArea, textToType).then(() => {
                 // The typing has completed, observe the DOM changes to enable the button
