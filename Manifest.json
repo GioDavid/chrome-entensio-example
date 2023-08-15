@@ -3,8 +3,15 @@
   "name": "vettx-extension",
   "version": "1.0",
   "description": "ok",
-  "permissions": ["activeTab", "storage", "scripting",
-    "declarativeContent"
+  "permissions": [
+    "activeTab", 
+    "storage",
+    "scripting",
+    "declarativeContent",
+    "webRequest",
+    "webNavigation",
+    "webRequest",
+    "tabs"
 ],
   "action": {
     "default_popup": "popup.html"
