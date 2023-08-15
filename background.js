@@ -60,6 +60,121 @@
 //   }
 // });
 
+function performOperationsInTab() {
+  // Obtener el mensaje inicial desde el almacenamiento local
+  chrome.storage.local.get(['initialMessage'], function (result) {
+    const modalButton = document.querySelector('div[aria-label="Message"]');
+    if(modalButton) {
+      modalButton.click();
+
+      setTimeout(() => {
+        const textarea = document.querySelector('textarea[id^=":"]');
+   
+        function simulateTyping(element, textToType) {
+          return new Promise((resolve) => {
+            const delay = 100;
+        
+            function typeCharacter(index) {
+              if (index < textToType.length) {
+                const char = textToType[index];
+                const inputEvent = new InputEvent('input', {
+                  bubbles: true,
+                  cancelable: true,
+                  composed: true,
+                  data: char,
+                  inputType: 'insertText',
+                });
+        
+                element.value += char;
+                element.dispatchEvent(inputEvent);
+        
+                setTimeout(() => {
+                  typeCharacter(index + 1);
+                }, delay);
+              } else {
+                resolve();
+              }
+            }
+        
+            typeCharacter(0);
+          });
+        }
+
+        const spans = document.getElementsByTagName('span');
+        let firstSpan = null;
+
+        Array.from(spans).forEach(function(span) {
+            var spanText = span.textContent;
+    
+            if (spanText.includes("Is this still available")) {
+               firstSpan = span;
+            }
+        });
+
+        if(firstSpan) {
+          firstSpan.parentElement.parentElement.click();  
+          const modalTextArea = document.querySelector('textarea[id^=":"]');
+
+          if (modalTextArea) {
+            
+            const textToType = result.initialMessage || "Is this still available?";
+          
+            simulateTyping(modalTextArea, textToType).then(() => {
+              const ariaLabel = 'Send Message';
+              const myButton = document.querySelector(`[aria-label="${ariaLabel}"]`);
+              // myButton.click(); 
+            
+            }).catch(error => {
+              console.error(error);
+            });
+          }
+        }
+      }, 1000);
+    } else {
+      const sendAgain = document.querySelector('div[aria-label="Message Again"]');
+      sendAgain.click();
+
+      setTimeout(() => {
+        const messageArea = document.querySelector('div[aria-describedby^=":"]');
+
+        if(messageArea) {
+
+          function handleSpanAdded(event) {
+            console.log("New span element added:", event.target);
+            // Do something with the newly added <span> element
+            // For example, you can access event.target to get the newly added <span> element
+          }
+
+          const children = messageArea.children;
+
+// Loop through the children and do something with each one
+        for (const child of children) {
+          const newSpan = document.createElement("span");
+          newSpan.textContent = result.savedTexts[0];
+          newSpan.setAttribute("data-lexical-text", "true");
+          child.appendChild(newSpan);
+          const event = new Event("spanAdded", { bubbles: true });
+          child.dispatchEvent(event);
+          console.log(child.innerHTML); // This should now include the new <span> element
+        }
+
+        window.requestAnimationFrame(() => {
+          // The page should now show the added <span> elements visually
+        });
+        
+        for (const child of children) {
+          child.addEventListener("spanAdded", handleSpanAdded);
+        }
+          
+
+        } else {
+          console.log('Element not found');
+        }
+      }, 1000);
+    }
+  });
+}
+
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => {
 
@@ -70,18 +185,25 @@ chrome.webRequest.onBeforeRequest.addListener(
       const url = dataArray[1]?.replace('url=', '');
 
       chrome.storage.local.set({ initialMessage: message }, function () {
-        chrome.tabs.create({ url }, (tab) => {
+        chrome.tabs.create({ url, active: false }, (tab) => {
           chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
-            if (tabId === tab.id && changeInfo.status === 'complete') {
-              // El tab ha cargado completamente, enviar el mensaje al content script
-              chrome.tabs.sendMessage(tabId, { action: 'sendMessage' }, function (response) {
-                // Manejar la respuesta del content script si es necesario
-                console.log('Respuesta del content script:', response);
-              });
-
-              // Desvincular el evento para evitar duplicados
-              chrome.tabs.onUpdated.removeListener(listener);
-            }
+            chrome.scripting.executeScript(
+              {
+                target: { tabId: tab.id },
+                function: performOperationsInTab,
+              },
+              () => {
+                // Cierra la pestaña después de completar las operaciones
+                // chrome.tabs.remove(tab.id);
+              }
+            );
+            // if ((changeInfo && changeInfo.status == 'complete') || !changeInfo) {
+            //   chrome.tabs.sendMessage(tabId, { action: 'sendMessage' }, function (response) {
+            //     console.log('Respuesta del content script:', response);
+            //   });
+            //   // Remove this event listener since we only want to trigger once!
+            //   chrome.tabs.onUpdated.removeListener(listener);
+            // }
           });
         });
       });
@@ -89,4 +211,5 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
   { urls: ['<all_urls>'] },
 );
+
 

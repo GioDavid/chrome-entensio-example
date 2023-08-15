@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     // Enviar una respuesta a la extensión si es necesario
     sendResponse({ status: 'Información obtenida del DOM 1' });
-    pasteText();
+    // pasteText();
   }
 });
 
@@ -64,10 +64,12 @@ function pasteText() {
         Array.from(spans).forEach(function(span) {
             var spanText = span.textContent;
     
-            if (spanText.includes("Is this still available?")) {
+            if (spanText.includes("Is this still available")) {
                firstSpan = span;
             }
         });
+
+        console.log(firstSpan);
 
         if(firstSpan) {
           firstSpan.parentElement.parentElement.click();  
@@ -80,14 +82,14 @@ function pasteText() {
             simulateTyping(modalTextArea, textToType).then(() => {
               const ariaLabel = 'Send Message';
               const myButton = document.querySelector(`[aria-label="${ariaLabel}"]`);
-              // myButton.click(); 
+              myButton.click(); 
             
             }).catch(error => {
               console.error(error);
             });
           }
         }
-      }, 1000);
+      }, 2000);
     } else {
       const sendAgain = document.querySelector('div[aria-label="Message Again"]');
       sendAgain.click();
