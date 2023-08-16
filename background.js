@@ -69,37 +69,6 @@ function performOperationsInTab() {
 
       setTimeout(() => {
         const textarea = document.querySelector('textarea[id^=":"]');
-   
-        function simulateTyping(element, textToType) {
-          return new Promise((resolve) => {
-            const delay = 100;
-        
-            function typeCharacter(index) {
-              if (index < textToType.length) {
-                const char = textToType[index];
-                const inputEvent = new InputEvent('input', {
-                  bubbles: true,
-                  cancelable: true,
-                  composed: true,
-                  data: char,
-                  inputType: 'insertText',
-                });
-        
-                element.value += char;
-                element.dispatchEvent(inputEvent);
-        
-                setTimeout(() => {
-                  typeCharacter(index + 1);
-                }, delay);
-              } else {
-                resolve();
-              }
-            }
-        
-            typeCharacter(0);
-          });
-        }
-
         const spans = document.getElementsByTagName('span');
         let firstSpan = null;
 
@@ -113,21 +82,39 @@ function performOperationsInTab() {
 
         if(firstSpan) {
           firstSpan.parentElement.parentElement.click();  
-          const modalTextArea = document.querySelector('textarea[id^=":"]');
+          setTimeout(() => {
+            const modalTextArea = document.querySelector('textarea[id^=":"]');
+
+            function simulateTyping(element, textToType) {
+              return new Promise((resolve) => {
+                element.focus();
+                element.value = textToType;
+            
+                // Disparar evento 'input'
+                const inputEvent = new Event('input', { bubbles: true });
+                element.dispatchEvent(inputEvent);
+            
+                // Disparar evento 'change'
+                const changeEvent = new Event('change', { bubbles: true });
+                element.dispatchEvent(changeEvent);
+            
+                resolve();
+              });
+            }
 
           if (modalTextArea) {
-            
-            const textToType = result.initialMessage || "Is this still available?";
-          
+            const textToType = result.initialMessage || "Is this still available, I'm interested?";
+            modalTextArea.value = textToType;
+
             simulateTyping(modalTextArea, textToType).then(() => {
+              // console.log(`Modal Textarea found`);
               const ariaLabel = 'Send Message';
               const myButton = document.querySelector(`[aria-label="${ariaLabel}"]`);
-              // myButton.click(); 
-            
-            }).catch(error => {
-              console.error(error);
+              console.log(`this is the current button ${myButton}`);
+              myButton.click(); 
             });
           }
+          }, 1000);
         }
       }, 1000);
     } else {
@@ -141,8 +128,6 @@ function performOperationsInTab() {
 
           function handleSpanAdded(event) {
             console.log("New span element added:", event.target);
-            // Do something with the newly added <span> element
-            // For example, you can access event.target to get the newly added <span> element
           }
 
           const children = messageArea.children;
@@ -197,13 +182,6 @@ chrome.webRequest.onBeforeRequest.addListener(
                 // chrome.tabs.remove(tab.id);
               }
             );
-            // if ((changeInfo && changeInfo.status == 'complete') || !changeInfo) {
-            //   chrome.tabs.sendMessage(tabId, { action: 'sendMessage' }, function (response) {
-            //     console.log('Respuesta del content script:', response);
-            //   });
-            //   // Remove this event listener since we only want to trigger once!
-            //   chrome.tabs.onUpdated.removeListener(listener);
-            // }
           });
         });
       });
