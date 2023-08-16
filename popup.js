@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var grabButton = document.getElementById('grabButton');
   var pasteButton = document.getElementById('pasteButton');
   var dropButton = document.getElementById('dropButton');
-  var textDisplay = document.getElementById('textDisplay');
 
   function coypinClipboard (value) {
 if (!navigator.clipboard){
@@ -183,13 +182,10 @@ if (!navigator.clipboard){
 
             function handleSpanAdded(event) {
               console.log("New span element added:", event.target);
-              // Do something with the newly added <span> element
-              // For example, you can access event.target to get the newly added <span> element
             }
 
             const children = messageArea.children;
   
-  // Loop through the children and do something with each one
           for (const child of children) {
             const newSpan = document.createElement("span");
             newSpan.textContent = result.savedTexts[0];
@@ -197,7 +193,7 @@ if (!navigator.clipboard){
             child.appendChild(newSpan);
             const event = new Event("spanAdded", { bubbles: true });
             child.dispatchEvent(event);
-            console.log(child.innerHTML); // This should now include the new <span> element
+            console.log(child.innerHTML);
           }
 
           window.requestAnimationFrame(() => {

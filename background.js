@@ -1,5 +1,4 @@
 function performOperationsInTab() {
-  // Obtener el mensaje inicial desde el almacenamiento local
   chrome.storage.local.get(['initialMessage'], function (result) {
     const modalButton = document.querySelector('div[aria-label="Message"]');
     if(modalButton) {
@@ -45,7 +44,6 @@ function performOperationsInTab() {
             modalTextArea.value = textToType;
 
             simulateTyping(modalTextArea, textToType).then(() => {
-              // console.log(`Modal Textarea found`);
               const ariaLabel = 'Send Message';
               const myButton = document.querySelector(`[aria-label="${ariaLabel}"]`);
               console.log(`this is the current button ${myButton}`);
