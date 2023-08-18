@@ -360,7 +360,8 @@ if (!navigator.clipboard){
   
   // Imprimir los elementos seleccionados en la consola
   elements.forEach(element => {
-    console.log(element.textContent);
+    console.log(element);
+    // console.log(element.textContent);
   });
   }
 
@@ -431,7 +432,7 @@ if (!navigator.clipboard){
         var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
         // Simula un evento de clic en el elemento
         if (sendButton) {
-            sendButton.click();
+            // sendButton.click();
         }
       }, 1000);
     }

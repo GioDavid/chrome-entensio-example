@@ -54,44 +54,32 @@ function performOperationsInTab() {
         }
       }, 1000);
     } else {
-      const sendAgain = document.querySelector('div[aria-label="Message Again"]');
-      sendAgain.click();
-
       setTimeout(() => {
-        const messageArea = document.querySelector('div[aria-describedby^=":"]');
-
-        if(messageArea) {
-
-          function handleSpanAdded(event) {
-            console.log("New span element added:", event.target);
-          }
-
-          const children = messageArea.children;
-
-// Loop through the children and do something with each one
-        for (const child of children) {
-          const newSpan = document.createElement("span");
-          newSpan.textContent = result.savedTexts[0];
-          newSpan.setAttribute("data-lexical-text", "true");
-          child.appendChild(newSpan);
-          const event = new Event("spanAdded", { bubbles: true });
-          child.dispatchEvent(event);
-          console.log(child.innerHTML); // This should now include the new <span> element
-        }
-
-        window.requestAnimationFrame(() => {
-          // The page should now show the added <span> elements visually
-        });
+        const sendAgain = document.querySelector('div[aria-label="Message Again"]');
+        sendAgain.click();
+        setTimeout(() => {
+          const focusedElement = document.querySelector('div[aria-label="Message"]');
+          focusedElement.focus();
+          if (focusedElement.isContentEditable || focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA') {
+              var inputEvent = new InputEvent('input', {
+                  bubbles: true,
+                  cancelable: true,
+                  inputType: 'insertText',
+                  data: 'I want more info'
+              });
         
-        for (const child of children) {
-          child.addEventListener("spanAdded", handleSpanAdded);
-        }
-          
-
-        } else {
-          console.log('Element not found');
-        }
+              focusedElement.dispatchEvent(inputEvent);
+          }
+    
+          setTimeout(() => {
+            var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
+            // Simula un evento de clic en el elemento
+            if (sendButton) {
+                // sendButton.click();
+            }
+          }, 1000);
       }, 2000);
+      }, 1000);
     }
   });
 }
