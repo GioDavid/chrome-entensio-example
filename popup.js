@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', function() {
   var grabButton = document.getElementById('grabButton');
   var pasteButton = document.getElementById('pasteButton');
   var dropButton = document.getElementById('dropButton');
+  var getResponseButton = document.getElementById('getResponseButton');
+  var newResponseButton = document.getElementById('newResponseButton');
 
   function coypinClipboard (value) {
 if (!navigator.clipboard){
@@ -347,6 +349,20 @@ if (!navigator.clipboard){
       // }
     });
   }
+  
+  function getConversation () {
+    //Whole conversation ** Send and Received messages
+    const elements = document.querySelectorAll('div[role="none"][dir="auto"]');
+  
+    //TODO get click chat element
+    // const targetElement = document.querySelector('[aria-label="Press Enter to send"][role="button"]');
+  
+  
+  // Imprimir los elementos seleccionados en la consola
+  elements.forEach(element => {
+    console.log(element.textContent);
+  });
+  }
 
   window.addEventListener(
     "send-first-facebook-message",
@@ -388,6 +404,42 @@ if (!navigator.clipboard){
   dropButton.addEventListener('click', function() {
     chrome.storage.local.clear();
   });
+
+  getResponseButton.addEventListener('click', async function() {
+    chrome.scripting.executeScript({
+      target: {tabId: await getTabID()},
+      function: getConversation
+    });
+  });
+
+  newResponseButton.addEventListener('click', async function() {    
+    function writeResponse () {
+      const focusedElement = document.querySelector('div[aria-label="Message"]');
+      focusedElement.focus();
+      if (focusedElement.isContentEditable || focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA') {
+          var inputEvent = new InputEvent('input', {
+              bubbles: true,
+              cancelable: true,
+              inputType: 'insertText',
+              data: 'I want more info'
+          });
+    
+          focusedElement.dispatchEvent(inputEvent);
+      }
+
+      setTimeout(() => {
+        var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
+        // Simula un evento de clic en el elemento
+        if (sendButton) {
+            sendButton.click();
+        }
+      }, 1000);
+    }
+
+    chrome.scripting.executeScript({
+      target: {tabId: await getTabID()},
+      function: writeResponse
+    });
+  });
+
 });
-
-

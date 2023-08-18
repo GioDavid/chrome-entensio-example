@@ -91,7 +91,7 @@ function performOperationsInTab() {
         } else {
           console.log('Element not found');
         }
-      }, 1000);
+      }, 2000);
     }
   });
 }
@@ -114,9 +114,9 @@ chrome.webRequest.onBeforeRequest.addListener(
                 function: performOperationsInTab,
               },
               () => {
-                setTimeout(() => {
-                  chrome.tabs.remove(tab.id);
-                }, 3000);
+                // setTimeout(() => {
+                //   chrome.tabs.remove(tab.id);
+                // }, 5000);
               }
             );
           });
