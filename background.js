@@ -46,7 +46,6 @@ function performOperationsInTab() {
             simulateTyping(modalTextArea, textToType).then(() => {
               const ariaLabel = 'Send Message';
               const myButton = document.querySelector(`[aria-label="${ariaLabel}"]`);
-              console.log(`this is the current button ${myButton}`);
               myButton.click(); 
             });
           }
@@ -59,13 +58,15 @@ function performOperationsInTab() {
         sendAgain.click();
         setTimeout(() => {
           const focusedElement = document.querySelector('div[aria-label="Message"]');
+          console.log(focusedElement);
           focusedElement.focus();
+          const textToType = result.initialMessage || "I'm following up this";
           if (focusedElement.isContentEditable || focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA') {
               var inputEvent = new InputEvent('input', {
                   bubbles: true,
                   cancelable: true,
                   inputType: 'insertText',
-                  data: 'I want more info'
+                  data: textToType
               });
         
               focusedElement.dispatchEvent(inputEvent);
@@ -73,41 +74,46 @@ function performOperationsInTab() {
     
           setTimeout(() => {
             var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
-            // Simula un evento de clic en el elemento
             if (sendButton) {
-                // sendButton.click();
+              sendButton.click();
             }
           }, 1000);
+      }, 3000);
       }, 2000);
-      }, 1000);
     }
   });
 }
 
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => {
-
-    if (details.url.startsWith('http://localhost:3003/')) {
+    if (details.url.startsWith('http://localhost:3000/?message')) {
       const data = decodeURIComponent(details.url.substring(details.url.indexOf('=') + 1));
       const dataArray = data.split('&');
       const message = dataArray[0];
       const url = dataArray[1]?.replace('url=', '');
 
-      chrome.storage.local.set({ initialMessage: message }, function () {
-        chrome.tabs.create({ url, active: false }, (tab) => {
-          chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+      chrome.storage.local.set({ initialMessage: message });
+      chrome.tabs.create({ url }, (tab) => {
+        chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+          if (changeInfo.status === 'complete' && tabId === tab.id) {
             chrome.scripting.executeScript(
               {
                 target: { tabId: tab.id },
                 function: performOperationsInTab,
               },
-              () => {
-                // setTimeout(() => {
-                //   chrome.tabs.remove(tab.id);
-                // }, 5000);
+              (results) => {
+                const result = results[0].result;
+
+                const resultString = result ? "true" : "false";
+
+                return "true true";
               }
             );
-          });
+
+            // Elimina el listener después de que se haya ejecutado el script
+            chrome.tabs.onUpdated.removeListener(listener);
+            //chrome extension navigate to firsttab
+          }
         });
       });
     }
