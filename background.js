@@ -58,7 +58,6 @@ function performOperationsInTab() {
         sendAgain.click();
         setTimeout(() => {
           const focusedElement = document.querySelector('div[aria-label="Message"]');
-          console.log(focusedElement);
           focusedElement.focus();
           const textToType = result.initialMessage || "I'm following up this";
           if (focusedElement.isContentEditable || focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA') {
@@ -73,10 +72,36 @@ function performOperationsInTab() {
           }
     
           setTimeout(() => {
-            var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
-            if (sendButton) {
-              sendButton.click();
-            }
+            // var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
+            // if (sendButton) {
+            //   sendButton.click();
+            // }
+            // chrome.tabs.sendMessage(targetTabId, { data: "Sent" });
+            const elements = document.querySelectorAll('div[role="none"][dir="auto"]');
+            const messages = [];
+
+            elements.forEach(element => {
+              const classList = element.classList;
+              const messageText = element.innerText;
+              let messageType = '';
+            
+              // Verificar si tiene una de las clases específicas
+              if (classList.contains('x14ctfv')) {
+                messageType = 'sent';
+              } else if (classList.contains('xzsf02u')) {
+                messageType = 'received';
+              }
+            
+              // Agregar el mensaje al array con el tipo correspondiente
+              if (messageType) {
+                messages.push({ type: messageType, text: messageText });
+              }
+            });
+
+            chrome.storage.local.get(["senderTab"]).then((result) => {
+              const tabId = result.senderTab;
+              chrome.runtime.sendMessage({ type: 'activateAndExecuteScript', tabId, conversation: messages });
+            });
           }, 1000);
       }, 3000);
       }, 2000);
@@ -85,17 +110,23 @@ function performOperationsInTab() {
 }
 
 chrome.webRequest.onBeforeRequest.addListener(
-  (details) => {
+  async (details) => {
     if (details.url.startsWith('http://localhost:3000/?message')) {
       const data = decodeURIComponent(details.url.substring(details.url.indexOf('=') + 1));
       const dataArray = data.split('&');
       const message = dataArray[0];
       const url = dataArray[1]?.replace('url=', '');
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        const currentTabId = tabs[0].id;
+        chrome.storage.local.set({ senderTab: currentTabId });
+  
+    });
 
       chrome.storage.local.set({ initialMessage: message });
       chrome.tabs.create({ url }, (tab) => {
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
           if (changeInfo.status === 'complete' && tabId === tab.id) {
+            chrome.storage.local.set({ receiverTab: tabId });
             chrome.scripting.executeScript(
               {
                 target: { tabId: tab.id },
@@ -120,5 +151,28 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
   { urls: ['<all_urls>'] },
 );
+
+function sendResponseToOrigin (conversation) {
+  const button = document.getElementsByClassName("facebook-message-loading-button")[0];
+  button.setAttribute("data-conversation", JSON.stringify(conversation));
+  button.click();
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'activateAndExecuteScript') {
+    const tabId = message.tabId;
+    const conversation = message.conversation; // Obtén la conversación del mensaje
+
+    chrome.tabs.update(tabId, { active: true }, () => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId },
+          function: sendResponseToOrigin,
+          args: [conversation]
+        }
+      );
+    });
+  }
+});
 
 
