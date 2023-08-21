@@ -4,7 +4,7 @@ chrome.runtime.onInstalled.addListener(function() {
       {
         conditions: [
           new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: { schemes: ["http", "https"] }, // Puedes ajustar los esquemas aquí
+            pageUrl: { schemes: ["http", "https"] },
           }),
         ],
         actions: [new chrome.declarativeContent.ShowPageAction()],
@@ -15,11 +15,9 @@ chrome.runtime.onInstalled.addListener(function() {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.message) {
-    // Interact with the DOM here
     const modalButton = document.querySelector('div[aria-label="Message"]');
     console.log('modal: ', modalButton);
 
-    // Send a response back to the background script
     sendResponse({ status: 'DOM interaction successful' });
   }
 });
@@ -61,11 +59,11 @@ if (!navigator.clipboard){
 } else{
   navigator.clipboard.writeText(value).then(
       function(){
-          alert("yeah!"); // success 
+          alert("yeah!");
       })
     .catch(
        function() {
-          alert("err"); // error
+          alert("err");
     });
 } 
   }
@@ -92,7 +90,6 @@ if (!navigator.clipboard){
       const url = textClass.replace(/^communications-input-/, '');
       textarea.select();
 
-      // Execute the copy command
       document.execCommand('copy');
 
         
@@ -315,13 +312,10 @@ if (!navigator.clipboard){
 
             function handleSpanAdded(event) {
               console.log("New span element added:", event.target);
-              // Do something with the newly added <span> element
-              // For example, you can access event.target to get the newly added <span> element
             }
 
             const children = messageArea.children;
   
-  // Loop through the children and do something with each one
           for (const child of children) {
             const newSpan = document.createElement("span");
             newSpan.textContent = result.savedTexts[0];
@@ -329,7 +323,7 @@ if (!navigator.clipboard){
             child.appendChild(newSpan);
             const event = new Event("spanAdded", { bubbles: true });
             child.dispatchEvent(event);
-            console.log(child.innerHTML); // This should now include the new <span> element
+            console.log(child.innerHTML);
           }
 
           window.requestAnimationFrame(() => {
@@ -351,17 +345,9 @@ if (!navigator.clipboard){
   }
   
   function getConversation () {
-    //Whole conversation ** Send and Received messages
     const elements = document.querySelectorAll('div[role="none"][dir="auto"]');
-  
-    //TODO get click chat element
-    // const targetElement = document.querySelector('[aria-label="Press Enter to send"][role="button"]');
-  
-  
-  // Imprimir los elementos seleccionados en la consola
-  elements.forEach(element => {
+    elements.forEach(element => {
     console.log(element);
-    // console.log(element.textContent);
   });
   }
 
@@ -430,7 +416,6 @@ if (!navigator.clipboard){
 
       setTimeout(() => {
         var sendButton = document.querySelector('div[aria-label="Press Enter to send"]');
-        // Simula un evento de clic en el elemento
         if (sendButton) {
             // sendButton.click();
         }

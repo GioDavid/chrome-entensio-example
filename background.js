@@ -27,11 +27,9 @@ function performOperationsInTab() {
                 element.focus();
                 element.value = textToType;
             
-                // Disparar evento 'input'
                 const inputEvent = new Event('input', { bubbles: true });
                 element.dispatchEvent(inputEvent);
             
-                // Disparar evento 'change'
                 const changeEvent = new Event('change', { bubbles: true });
                 element.dispatchEvent(changeEvent);
             
@@ -76,7 +74,6 @@ function performOperationsInTab() {
             // if (sendButton) {
             //   sendButton.click();
             // }
-            // chrome.tabs.sendMessage(targetTabId, { data: "Sent" });
             const elements = document.querySelectorAll('div[role="none"][dir="auto"]');
             const messages = [];
 
@@ -85,14 +82,12 @@ function performOperationsInTab() {
               const messageText = element.innerText;
               let messageType = '';
             
-              // Verificar si tiene una de las clases específicas
               if (classList.contains('x14ctfv')) {
                 messageType = 'sent';
               } else if (classList.contains('xzsf02u')) {
                 messageType = 'received';
               }
             
-              // Agregar el mensaje al array con el tipo correspondiente
               if (messageType) {
                 messages.push({ type: messageType, text: messageText });
               }
@@ -123,7 +118,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     });
 
       chrome.storage.local.set({ initialMessage: message });
-      chrome.tabs.create({ url }, (tab) => {
+      chrome.tabs.create({ url, active: false }, (tab) => {
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
           if (changeInfo.status === 'complete' && tabId === tab.id) {
             chrome.storage.local.set({ receiverTab: tabId });
@@ -131,19 +126,10 @@ chrome.webRequest.onBeforeRequest.addListener(
               {
                 target: { tabId: tab.id },
                 function: performOperationsInTab,
-              },
-              (results) => {
-                const result = results[0].result;
-
-                const resultString = result ? "true" : "false";
-
-                return "true true";
               }
-            );
+          );
 
-            // Elimina el listener después de que se haya ejecutado el script
             chrome.tabs.onUpdated.removeListener(listener);
-            //chrome extension navigate to firsttab
           }
         });
       });
@@ -161,7 +147,7 @@ function sendResponseToOrigin (conversation) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'activateAndExecuteScript') {
     const tabId = message.tabId;
-    const conversation = message.conversation; // Obtén la conversación del mensaje
+    const conversation = message.conversation;
 
     chrome.tabs.update(tabId, { active: true }, () => {
       chrome.scripting.executeScript(
